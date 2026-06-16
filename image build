@@ -1,0 +1,17 @@
+1. Build: Daemonless, multi-stage buildah builds running as non-root.
+2. SBOM: syft generates a machine-readable inventory of all dependencies.
+3. Vuln Scan: trivy blocks the pipeline on CRITICAL/HIGH CVEs.
+4. Signing: cosign cryptographically signs the image digest (proves who and what).
+5. Attestation: Attaches SLSA provenance (proves how and where it was built).
+6. Registry: Secure storage of the image, .sig, .att, and SBOM artifacts.
+7. Publish: Artifact is cataloged in the Internal Developer Portal (IDP) for team consumption.
+8. Admission: Kubernetes (Kyverno/OPA) rejects pods lacking valid signatures or running as root.
+9. Drift Detection: Runtime agents (Falco) alert if a running pod's state deviates from its approved SBOM/policy.
+
+Agentic AI: Closing the Loop
+Automating responses across the 9 stages
+Agentic AI transforms the factory from a passive pipeline into an active, self-healing system:
+
+At Stage 3 (Vuln Scan): If Trivy fails, the AI Agent reads the report, finds the patched base image version, creates a Git branch, updates the CI variable, and opens an auto-remediation Merge Request.
+At Stage 5 (Attestation): AI analyzes the SLSA provenance to ensure no unauthorized manual steps were injected into the build process.
+At Stage 9 (Drift Detection): If Falco detects a newly published CVE affecting a running pod's SBOM, the AI Agent automatically drafts a PR to bump the dependency version and notifies the team via Slack/Teams.
