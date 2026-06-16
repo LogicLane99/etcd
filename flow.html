@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitLab Matrix Expansion Diagram - Horizontal</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.2rem;
+            color: #2563eb;
+            font-weight: 500;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .diagram-container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 1200px; /* Wider container for horizontal layout */
+            overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .legend {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .color-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        .btn-print {
+            position: fixed; top: 20px; right: 20px;
+            background: #2563eb; color: white;
+            border: none; padding: 10px 20px; border-radius: 8px;
+            font-size: 0.9rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+            z-index: 1000;
+        }
+        @media print {
+            .btn-print { display: none; }
+            body { background: white; padding: 0; }
+            .diagram-container { box-shadow: none; border: 1px solid #e2e8f0; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+
+    <h1>GitLab Matrix Expansion (Horizontal Flow)</h1>
+    <h2>Mapping YAML Groups to 7 Discrete CI Jobs</h2>
+
+    <div class="diagram-container">
+        <div class="mermaid">
+graph LR
+    YAML[📄 <b>.gitlab-ci.yml</b><br/><i>parallel: matrix</i>] --> Engine[⚙️ <b>GitLab Matrix Engine</b><br/><i>Expands to 7 Jobs</i>]
+    
+    subgraph G1 [Group 1: Tomcat]
+        direction TB
+        T1[<b>Job 1: Tomcat 9</b><br/><code>RUNTIME=tomcat</code><br/><code>VERSION=9</code>]
+        T2[<b>Job 2: Tomcat 10</b><br/><code>RUNTIME=tomcat</code><br/><code>VERSION=10</code>]
+    end
+    
+    subgraph G2 [Group 2: Node.js]
+        direction TB
+        N1[<b>Job 3: Node 18</b><br/><code>RUNTIME=nodejs</code><br/><code>VERSION=18</code>]
+        N2[<b>Job 4: Node 20</b><br/><code>RUNTIME=nodejs</code><br/><code>VERSION=20</code>]
+        N3[<b>Job 5: Node 22</b><br/><code>RUNTIME=nodejs</code><br/><code>VERSION=22</code>]
+    end
+    
+    subgraph G3 [Group 3: WebSphere]
+        direction TB
+        W1[<b>Job 6: WAS 23.0</b><br/><code>RUNTIME=websphere</code><br/><code>VERSION=23.0</code>]
+        W2[<b>Job 7: WAS 24.0</b><br/><code>RUNTIME=websphere</code><br/><code>VERSION=24.0</code>]
+    end
+
+    Engine --> G1
+    Engine --> G2
+    Engine --> G3
+
+    style YAML fill:#f8fafc,stroke:#334155,stroke-width:2px,color:#334155
+    style Engine fill:#f59e0b,stroke:#b45309,stroke-width:3px,color:#fff
+    
+    style T1 fill:#ef4444,color:#fff,stroke:#b91c1c
+    style T2 fill:#ef4444,color:#fff,stroke:#b91c1c
+    
+    style N1 fill:#10b981,color:#fff,stroke:#047857
+    style N2 fill:#10b981,color:#fff,stroke:#047857
+    style N3 fill:#10b981,color:#fff,stroke:#047857
+    
+    style W1 fill:#8b5cf6,color:#fff,stroke:#6d28d9
+    style W2 fill:#8b5cf6,color:#fff,stroke:#6d28d9
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item"><div class="color-box" style="background: #ef4444;"></div> Tomcat Jobs</div>
+            <div class="legend-item"><div class="color-box" style="background: #10b981;"></div> Node.js Jobs</div>
+            <div class="legend-item"><div class="color-box" style="background: #8b5cf6;"></div> WebSphere Jobs</div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { 
+                useMaxWidth: false, /* Allows the diagram to expand horizontally */
+                htmlLabels: true, 
+                curve: 'basis', 
+                rankSpacing: 100, /* Adds space between the Engine and the Groups */
+                nodeSpacing: 30,
+                diagramPadding: 20
+            }
+        });
+    </script>
+</body>
+</html>
