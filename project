@@ -1,0 +1,13 @@
+platform-harness/
+├── .env
+├── .gitignore
+├── requirements.txt
+├── app/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── remote_agents.py
+│   ├── tools.py
+│   ├── harness.py
+│   └── main.py
+└── tests/
+    └── test_gateway.py
