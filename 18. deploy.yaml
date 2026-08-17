@@ -1,0 +1,207 @@
+apiVersion: batch/v1
+kind: CronJob
+
+metadata:
+
+  name: agent-evaluation
+
+  namespace: monitoring
+
+  labels:
+    app: agent-evaluation
+
+
+spec:
+
+  # ==========================================================
+  # Schedule
+  # ==========================================================
+
+  # Every day at 02:00 UTC
+  schedule: "0 2 * * *"
+
+
+  # Never run two evaluations simultaneously.
+  concurrencyPolicy: Forbid
+
+
+  # Keep job history for troubleshooting.
+  successfulJobsHistoryLimit: 3
+
+  failedJobsHistoryLimit: 5
+
+
+  # If Kubernetes misses the scheduled time by more than
+  # 30 minutes, don't start an old evaluation.
+  startingDeadlineSeconds: 1800
+
+
+  jobTemplate:
+
+    spec:
+
+      # Retry failed jobs twice.
+      backoffLimit: 2
+
+
+      # Maximum runtime:
+      # 2 hours
+      activeDeadlineSeconds: 7200
+
+
+      template:
+
+        metadata:
+
+          labels:
+            app: agent-evaluation
+
+
+        spec:
+
+          restartPolicy: Never
+
+
+          # ==================================================
+          # Nexus
+          # ==================================================
+
+          imagePullSecrets:
+
+            - name: nexus-registry-secret
+
+
+          # ==================================================
+          # Security
+          # ==================================================
+
+          securityContext:
+
+            runAsNonRoot: true
+
+
+          containers:
+
+            - name: agent-evaluation
+
+
+              # =================================================
+              # Nexus image
+              # =================================================
+
+              image: nexus.company.com:8083/agent-evaluation:1.0.0
+
+
+              imagePullPolicy: IfNotPresent
+
+
+              # =================================================
+              # Environment
+              # =================================================
+
+              env:
+
+
+                # -----------------------------------------------
+                # PostgreSQL
+                # -----------------------------------------------
+
+                - name: DATABASE_URL
+
+                  valueFrom:
+
+                    secretKeyRef:
+
+                      name: agent-evaluation-secrets
+
+                      key: DATABASE_URL
+
+
+                # -----------------------------------------------
+                # Agentgateway
+                # -----------------------------------------------
+
+                - name: LLM_BASE_URL
+
+                  value: >-
+                    http://agentgateway-proxy.agentgateway-system.svc.cluster.local/v1
+
+
+                # -----------------------------------------------
+                # Evaluation model
+                # -----------------------------------------------
+
+                - name: EVAL_MODEL
+
+                  value: "gpt-4.1"
+
+
+                # -----------------------------------------------
+                # Evaluation version
+                # -----------------------------------------------
+
+                - name: EVAL_VERSION
+
+                  value: "v1.0"
+
+
+                # -----------------------------------------------
+                # Maximum incidents per run
+                # -----------------------------------------------
+
+                - name: EVAL_BATCH_SIZE
+
+                  value: "1000"
+
+
+                # -----------------------------------------------
+                # Optional agentgateway client authentication
+                #
+                # DELETE this block if gateway does not require
+                # client authentication.
+                # -----------------------------------------------
+
+                # - name: AGENTGATEWAY_API_KEY
+                #
+                #   valueFrom:
+                #
+                #     secretKeyRef:
+                #
+                #       name: agentgateway-client-secret
+                #
+                #       key: token
+
+
+              # =================================================
+              # Resources
+              # =================================================
+
+              resources:
+
+                requests:
+
+                  cpu: "250m"
+
+                  memory: "512Mi"
+
+
+                limits:
+
+                  cpu: "2"
+
+                  memory: "2Gi"
+
+
+              # =================================================
+              # Container security
+              # =================================================
+
+              securityContext:
+
+                allowPrivilegeEscalation: false
+
+                capabilities:
+
+                  drop:
+
+                    - ALL
