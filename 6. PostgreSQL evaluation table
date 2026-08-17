@@ -1,0 +1,90 @@
+CREATE TABLE IF NOT EXISTS agent_evaluations (
+    id BIGSERIAL PRIMARY KEY,
+
+    incident_id TEXT NOT NULL,
+
+    evaluation_date DATE NOT NULL,
+
+    evaluated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    evaluator_version TEXT NOT NULL,
+
+    evaluator_model TEXT NOT NULL,
+
+
+    -- =====================================================
+    -- LLM scores
+    -- =====================================================
+
+    rootcause_score DOUBLE PRECISION,
+
+    evidence_score DOUBLE PRECISION,
+
+    next_step_score DOUBLE PRECISION,
+
+    completeness_score DOUBLE PRECISION,
+
+    overall_score DOUBLE PRECISION,
+
+
+    -- =====================================================
+    -- Deterministic checks
+    -- =====================================================
+
+    has_rootcause BOOLEAN,
+
+    has_evidence BOOLEAN,
+
+    has_next_step BOOLEAN,
+
+    confidence_valid BOOLEAN,
+
+    timestamps_valid BOOLEAN,
+
+    deterministic_score DOUBLE PRECISION,
+
+
+    -- =====================================================
+    -- Final score
+    -- =====================================================
+
+    final_score DOUBLE PRECISION,
+
+
+    -- =====================================================
+    -- LLM explanations
+    -- =====================================================
+
+    rootcause_reason TEXT,
+
+    evidence_reason TEXT,
+
+    next_step_reason TEXT,
+
+    completeness_reason TEXT,
+
+
+    -- =====================================================
+    -- Errors
+    -- =====================================================
+
+    evaluation_error TEXT,
+
+
+    UNIQUE (
+        incident_id,
+        evaluator_version
+    )
+);
+
+
+CREATE INDEX IF NOT EXISTS idx_agent_evaluations_date
+ON agent_evaluations(evaluation_date);
+
+
+CREATE INDEX IF NOT EXISTS idx_agent_evaluations_final_score
+ON agent_evaluations(final_score);
+
+
+CREATE INDEX IF NOT EXISTS idx_agent_evaluations_incident
+ON agent_evaluations(incident_id);
