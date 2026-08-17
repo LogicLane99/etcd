@@ -1,0 +1,3 @@
+deepeval
+psycopg[binary]
+python-dotenv
