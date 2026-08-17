@@ -1,0 +1,12 @@
+agent-evaluation/
+│
+├── Dockerfile
+├── .dockerignore
+├── requirements.txt
+│
+├── config.py
+├── database.py
+├── llm_model.py
+├── metrics.py
+├── evaluator.py
+└── main.py
